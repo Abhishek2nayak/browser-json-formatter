@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON Forge</title>
+  <link rel="stylesheet" href="viewer.css" />
+</head>
+<body class="theme-dark">
+
+  <!-- ===== TOOLBAR ===== -->
+  <header id="toolbar">
+
+    <!-- LEFT: brand + stats -->
+    <div id="toolbar-left">
+      <span id="app-logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.7"
+                stroke-linejoin="round" fill="currentColor" opacity="0.2"/>
+          <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span id="app-title">JSON Forge</span>
+      <span id="toolbar-divider"></span>
+      <span id="json-stats" title="JSON statistics"></span>
+    </div>
+
+    <!-- CENTER: search -->
+    <div id="toolbar-center">
+      <div id="search-wrapper">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+             style="flex-shrink:0;color:var(--text-muted)">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="search-input"
+               placeholder="Search keys or values… (Ctrl+F)"
+               autocomplete="off" spellcheck="false" />
+        <span id="search-count"></span>
+        <button id="search-prev"  class="icon-btn" title="Previous (Shift+Enter)">&#8593;</button>
+        <button id="search-next"  class="icon-btn" title="Next (Enter)">&#8595;</button>
+        <button id="search-clear" class="icon-btn" title="Clear (Esc)">&#10005;</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: action buttons -->
+    <div id="toolbar-right">
+
+      <!-- Expand / Collapse group -->
+      <div class="btn-group">
+        <button id="btn-expand-all" class="toolbar-btn" title="Expand all (Ctrl+E)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          Expand
+        </button>
+        <button id="btn-collapse-all" class="toolbar-btn" title="Collapse all (Ctrl+Shift+E)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          Collapse
+        </button>
+        <!-- Collapse-to-depth dropdown -->
+        <select id="collapse-depth" class="toolbar-select" title="Collapse to depth">
+          <option value="">Depth…</option>
+          <option value="1">Depth 1</option>
+          <option value="2">Depth 2</option>
+          <option value="3">Depth 3</option>
+          <option value="4">Depth 4</option>
+        </select>
+      </div>
+
+      <span class="toolbar-sep"></span>
+
+      <!-- Raw / Tree toggle -->
+      <button id="btn-raw" class="toolbar-btn" title="Toggle raw JSON view">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M8 6l-6 6 6 6M16 6l6 6-6 6" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Raw
+      </button>
+
+      <!-- Copy JSON -->
+      <button id="btn-copy-json" class="toolbar-btn" title="Copy formatted JSON">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Copy
+      </button>
+
+      <!-- Download -->
+      <button id="btn-download" class="toolbar-btn" title="Download JSON file">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3v13M7 11l5 5 5-5" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Download
+      </button>
+
+      <span class="toolbar-sep"></span>
+
+      <!-- Theme toggle -->
+      <button id="btn-theme" class="toolbar-btn icon-only" title="Toggle dark/light mode">
+        <svg id="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg id="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" style="display:none">
+          <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="1"  x2="12" y2="3"  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== URL BAR ===== -->
+  <div id="url-bar">
+    <span id="url-label">GET</span>
+    <span id="url-text"></span>
+    <button id="btn-copy-url" class="icon-btn url-copy-btn" title="Copy URL">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+              stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast" aria-live="polite"></div>
+
+  <!-- ===== CONTEXT MENU ===== -->
+  <div id="context-menu" class="hidden">
+    <ul>
+      <li id="ctx-copy-value">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Copy value
+      </li>
+      <li id="ctx-copy-path">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Copy JSON path
+      </li>
+      <li id="ctx-copy-subtree">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Copy subtree as JSON
+      </li>
+      <li class="ctx-separator"></li>
+      <li id="ctx-expand-node">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        Expand all children
+      </li>
+      <li id="ctx-collapse-node">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        Collapse all children
+      </li>
+    </ul>
+  </div>
+
+  <!-- ===== MAIN AREA ===== -->
+  <main id="main-area">
+    <!-- Tree view (default) -->
+    <div id="json-container">
+      <div id="json-tree"></div>
+    </div>
+    <!-- Raw view (hidden by default) -->
+    <div id="raw-container" class="hidden">
+      <pre id="raw-output"></pre>
+    </div>
+  </main>
+
+  <!-- ===== STATUS BAR ===== -->
+  <footer id="status-bar">
+    <span id="status-path">Hover a node to see its path</span>
+    <span id="status-type"></span>
+  </footer>
+
+  <script src="viewer.js"></script>
+</body>
+</html>
